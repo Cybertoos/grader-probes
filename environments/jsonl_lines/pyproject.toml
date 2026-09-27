@@ -2,7 +2,7 @@
 name = "jsonl-lines"
 description = "Parsing tasks from real bugs in agent tooling (JSONL split on \\n only, frontmatter), graded by hidden tests in a separate process"
 tags = ["coding", "python", "parsing", "single-turn", "train", "eval"]
-version = "0.1.1"
+version = "0.1.2"
 requires-python = ">=3.10"
 dependencies = [
     "verifiers>=0.2.0",

@@ -1,0 +1,43 @@
+{
+ "name": "jsonl-lines (Node grader)",
+ "workspace": "workspace",
+ "oracle": "oracle",
+ "score": "tap",
+ "timeoutMs": 30000,
+ "mutations": [
+  {
+   "name": "readline-split",
+   "file": "src/lines.mjs",
+   "find": "(i = rest.indexOf(\"\\n\")) !== -1",
+   "replace": "(i = rest.search(/[\\n\\u2028\\u2029]/)) !== -1",
+   "why": "the real bug: node:readline also splits on U+2028 and U+2029 and cut 114 records"
+  },
+  {
+   "name": "keep-cr",
+   "file": "src/lines.mjs",
+   "find": "yield rest.slice(0, i).replace(/\\r$/, \"\");",
+   "replace": "yield rest.slice(0, i);",
+   "why": "CRLF files keep a trailing carriage return"
+  },
+  {
+   "name": "no-decoder",
+   "file": "src/lines.mjs",
+   "find": "rest += decoder.write(chunk);",
+   "replace": "rest += chunk.toString(\"utf8\");",
+   "why": "a multibyte character split across chunks is corrupted"
+  },
+  {
+   "name": "drop-last",
+   "file": "src/lines.mjs",
+   "find": "if (rest) yield rest.replace(/\\r$/, \"\");",
+   "replace": "",
+   "why": "the last record is lost when the file has no final newline"
+  }
+ ],
+ "grade": [
+  "node",
+  "--test",
+  "--test-reporter=tap",
+  "{task}/grader/lines.test.mjs"
+ ]
+}

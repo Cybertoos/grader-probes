@@ -1,0 +1,37 @@
+{
+ "name": "env task split-jsonl",
+ "workspace": "workspace",
+ "oracle": "oracle",
+ "score": "tap",
+ "timeoutMs": 60000,
+ "grade": [
+  "python3",
+  "{task}/../../../environments/jsonl_lines/jsonl_lines.py",
+  "grade",
+  "{ws}/solution.py",
+  "split-jsonl"
+ ],
+ "mutations": [
+  {
+   "name": "splitlines",
+   "file": "solution.py",
+   "find": "        while \"\\n\" in rest:\n            line, rest = rest.split(\"\\n\", 1)\n            out.append(line[:-1] if line.endswith(\"\\r\") else line)\n",
+   "replace": "        *done, rest = rest.splitlines(keepends=False) + [\"\"] if rest.endswith(\"\\n\") else (rest.splitlines() or [\"\"])\n        out.extend(done)\n",
+   "why": "str.splitlines also breaks on U+2028 and U+2029, the readline bug"
+  },
+  {
+   "name": "decode-per-chunk",
+   "file": "solution.py",
+   "find": "rest += decoder.decode(chunk)",
+   "replace": "rest += chunk.decode('utf-8', 'replace')",
+   "why": "a character split across chunks is corrupted"
+  },
+  {
+   "name": "drop-last",
+   "file": "solution.py",
+   "find": "    if rest:\n        out.append(rest[:-1] if rest.endswith(\"\\r\") else rest)\n",
+   "replace": "",
+   "why": "no final newline loses the last record"
+  }
+ ]
+}

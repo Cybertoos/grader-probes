@@ -1,0 +1,37 @@
+{
+ "name": "env task parse-item",
+ "workspace": "workspace",
+ "oracle": "oracle",
+ "score": "tap",
+ "timeoutMs": 60000,
+ "grade": [
+  "python3",
+  "{task}/../../../environments/jsonl_lines/jsonl_lines.py",
+  "grade",
+  "{ws}/solution.py",
+  "parse-item"
+ ],
+ "mutations": [
+  {
+   "name": "split-every-colon",
+   "file": "solution.py",
+   "find": "key, sep, value = line.partition(\": \")",
+   "replace": "key, sep, value = line.rpartition(\": \")",
+   "why": "a value containing ': ' is cut"
+  },
+  {
+   "name": "keep-all-keys",
+   "file": "solution.py",
+   "find": "if sep and key.strip() in FIELDS:",
+   "replace": "if sep:",
+   "why": "unknown keys leak into the item"
+  },
+  {
+   "name": "no-default-priority",
+   "file": "solution.py",
+   "find": "item[\"priority\"] = int(item.get(\"priority\", 3))",
+   "replace": "item[\"priority\"] = int(item[\"priority\"]) if \"priority\" in item else None",
+   "why": "missing priority is not 3"
+  }
+ ]
+}

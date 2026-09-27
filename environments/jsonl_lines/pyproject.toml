@@ -1,0 +1,20 @@
+[project]
+name = "jsonl-lines"
+description = "Parsing tasks from real bugs in agent tooling (JSONL split on \\n only, frontmatter), graded by hidden tests in a separate process"
+tags = ["coding", "python", "parsing", "single-turn", "train", "eval"]
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "verifiers>=0.2.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+include = ["jsonl_lines.py", "pyproject.toml"] 
+
+[tool.verifiers.eval]
+num_examples = 5
+rollouts_per_example = 3

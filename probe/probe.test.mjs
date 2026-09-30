@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { loadSpec, probe, scoreOf } from './probe.mjs';
+import { applyMutation, loadSpec, probe, scoreOf } from './probe.mjs';
 
 const example = (f) => fileURLToPath(new URL(`./examples/jsonl-lines/${f}`, import.meta.url));
 
@@ -27,6 +27,12 @@ test('a mutation whose text is no longer in the file fails instead of passing', 
   const row = probe(spec).find((r) => r.probe === 'mutation rotted');
   assert.equal(row.ok, false);
   assert.match(row.note, /found it 0 times/);
+});
+
+test('replace text with $ patterns is inserted as written', () => {
+  for (const rep of ["x = '$&'", "y = f'$$'", "s = '$`'", "t = \"$'\""]) {
+    assert.equal(applyMutation('a\nold\nb\n', { name: 'm', file: 'f', find: 'old', replace: rep }), `a\n${rep}\nb\n`);
+  }
 });
 
 test('a solution that reads the answers from the grader file scores 0', () => {

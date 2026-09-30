@@ -20,12 +20,16 @@ export function scoreOf(kind, status, stdout) {
   return total ? pass / total : 0;
 }
 
-function mutate(ws, m) {
-  const path = join(ws, m.file);
-  const src = readFileSync(path, 'utf8');
+// The replace text is inserted as written: a function replacer keeps $&, $', $` and $$ from being expanded.
+export function applyMutation(src, m) {
   const hits = src.split(m.find).length - 1;
   if (hits !== 1) throw new Error(`mutation "${m.name}": expected the find text once in ${m.file}, found it ${hits} times`);
-  writeFileSync(path, src.replace(m.find, m.replace));
+  return src.replace(m.find, () => m.replace);
+}
+
+function mutate(ws, m) {
+  const path = join(ws, m.file);
+  writeFileSync(path, applyMutation(readFileSync(path, 'utf8'), m));
 }
 
 // A grader must not inherit a surrounding node --test run, or it reports in that run's format.
